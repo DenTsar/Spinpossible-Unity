@@ -7,8 +7,6 @@ public class Board
     public (GameObject, bool)[,] board;
     int size = 25;
 
-
-
     public Board(int dimX, int dimY, GameObject square)
     {
         board = new (GameObject, bool)[dimY, dimX];

@@ -29,25 +29,22 @@ public class BoardController : MonoBehaviour
         Debug.Log("Clicked" + getMousePos());
         pos1 = getMousePos();
     }
-    private void OnMouseUp()
+    private void OnMouseUpAsButton()//only triggered while mouse is still on collider
     {
+        if (isRotating) return;
+
         pos2 = getMousePos();
-        if (!isRotating && pos1 != -1)
+        int min = Mathf.Min(pos1, pos2);
+        int max = Mathf.Max(pos1, pos2);
+        if (min % dimX > max % dimX)
         {
-            int min = Mathf.Max(0, Mathf.Min(pos1, pos2));//thi currently lets you drag beyond the border and the spin to count
-            int max = Mathf.Max(pos1, pos2);
-            if (min % dimX > max % dimX)
-            {
-                int col = min % dimX;
-                min = min / dimX * dimX + max % dimX;
-                max = max / dimX * dimX + col;
-            }
-            Debug.Log("Swapping " + min + " " + max);
-            board.Rotate(min, max);
-            isRotating = true;
-            pos1 = -1;
-            pos2 = -1;
+            int col = min % dimX;
+            min = min / dimX * dimX + max % dimX;
+            max = max / dimX * dimX + col;
         }
+        Debug.Log("Swapping " + min + " " + max);
+        board.Rotate(min, max);
+        isRotating = true;
     }
 
     int getMousePos()
