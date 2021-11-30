@@ -11,7 +11,7 @@ public class Board
 
     public Board(int dimX, int dimY, GameObject square)
     {
-        board = new (GameObject, bool)[dimX, dimY];
+        board = new (GameObject, bool)[dimY, dimX];
 
         for (int i = 0; i < dimY; i++)
         {
@@ -19,7 +19,7 @@ public class Board
             {
                 GameObject block = GameObject.Instantiate(square, new Vector2(j - dimX / 2f + 0.5f, -i + dimY / 2f - 0.5f) * size, Quaternion.identity);//, GameObject.Find("BoardController").transform);
                 TextMesh text = block.GetComponent<TextMesh>();
-                text.text = i * 3 + j + 1 + "";
+                text.text = i * dimX + j + 1 + "";
                 text.anchor = TextAnchor.MiddleCenter;
 
                 board[i, j] = (block, true);
@@ -32,25 +32,25 @@ public class Board
         Debug.Log("Rotating: " + topLeft + " " + botRight);
 
         Transform twistser = new GameObject("Temp-Twister", typeof(Twist)).transform;
-        int x = board.GetLength(0);
-        int y = board.GetLength(1);
-        float xPos = (topLeft % 3 + botRight % 3) / 2f - (int)(3 / 2f);
-        float yPos = -(topLeft / 3 + botRight / 3) / 2f + (int)(3 / 2f);
+        int x = board.GetLength(1);
+        int y = board.GetLength(0);
+        float xPos = (topLeft % x + botRight % x) / 2f - (x - 1) / 2f;
+        float yPos = -(topLeft / x + botRight / x) / 2f + (y - 1) / 2f;
         twistser.position = new Vector2(xPos, yPos) * size;
 
-        for (int i = topLeft / y; i <= botRight / y; i++)
+        for (int i = topLeft / x; i <= botRight / x; i++)
             for (int j = topLeft % x; j <= botRight % x; j++)
             {
                 int pos = topLeft + botRight - (i * x + j);
                 if (pos >= i * x + j)
                 {
-                    var pair = board[pos / 3, pos % 3];
+                    var pair = board[pos / x, pos % x];
                     pair.Item1.transform.parent = twistser.transform;
                     board[i, j].Item1.transform.parent = twistser.transform;
                     Debug.Log("Flipping: " + board[i, j].Item1.GetComponent<TextMesh>().text + " " + pair.Item1.GetComponent<TextMesh>().text);
                     board[i, j].Item2 = !board[i, j].Item2;
                     pair.Item2 = !pair.Item2;
-                    board[pos / 3, pos % 3] = board[i, j];
+                    board[pos / x, pos % x] = board[i, j];
                     board[i, j] = pair;
                 }
             }

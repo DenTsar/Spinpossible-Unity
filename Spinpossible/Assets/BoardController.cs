@@ -14,19 +14,19 @@ public class BoardController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        dimX = 3;
-        dimY = 3;
+        dimX = 2;
+        dimY = 4;
         board = new Board(dimX, dimY, square);
         size = 25f * 1.5f;
 
-        transform.GetComponent<BoxCollider2D>().size = new Vector2(size / 1.5f * dimX, size / 1.5f * dimY);
+        transform.GetComponent<BoxCollider2D>().size = new Vector2(dimX, dimY) * size / 1.5f;
     }
 
     // Update is called once per frame
     void Update() { }
     private void OnMouseDown()
     {
-        Debug.Log("Clicked");
+        Debug.Log("Clicked" + getMousePos());
         pos1 = getMousePos();
     }
     private void OnMouseUp()
@@ -34,13 +34,13 @@ public class BoardController : MonoBehaviour
         pos2 = getMousePos();
         if (!isRotating && pos1 != -1)
         {
-            int min = Mathf.Max(0, Mathf.Min(pos1, pos2));
+            int min = Mathf.Max(0, Mathf.Min(pos1, pos2));//thi currently lets you drag beyond the border and the spin to count
             int max = Mathf.Max(pos1, pos2);
             if (min % dimX > max % dimX)
             {
                 int col = min % dimX;
-                min = min / dimY * dimX + max % dimX;
-                max = max / dimY * dimX + col;
+                min = min / dimX * dimX + max % dimX;
+                max = max / dimX * dimX + col;
             }
             Debug.Log("Swapping " + min + " " + max);
             board.Rotate(min, max);
@@ -53,6 +53,9 @@ public class BoardController : MonoBehaviour
     int getMousePos()
     {
         Vector3 point = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        return ((dimX - 1) - (int)(point.y / size + dimY / 2f)) * dimX + (int)(point.x / size + dimX / 2f);
+        float m = size / 1.5f;
+        int x = (int)((point.x + (dimX / 2f) * m) / m);
+        int y = (int)(dimY - (point.y + (dimY / 2f) * m) / m);
+        return x + y * dimX;
     }
 }
